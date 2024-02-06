@@ -19,15 +19,15 @@ curl -X POST \
       }' \
   http://localhost:3000/api/v1/frames/throw_ball
 =end
-  def throw_ball(throw1, throw2, throw3=nil)	#to_i will cover the scenario where if there is no value on throw1 or throw2, it will default to 0. throw3 is being checked for being present as frame 10 is the only frame that can have it and when doing the curl request may forget to add it to the post request body
-    if self.throw1.present?		#wont allow to play again on the same frame after it has already been played.
+  def throw_ball(throw1, throw2, throw3=nil)  #to_i will cover the scenario where if there is no value on throw1 or throw2, it will default to 0. throw3 is being checked for being present as frame 10 is the only frame that can have it and when doing the curl request may forget to add it to the post request body
+    if self.throw1.present?   #wont allow to play again on the same frame after it has already been played.
       puts "\nThis frame has already been played.\n"
       return
     end
 
     previous_frame = get_previous_frame
 
-    if previous_frame.present? && previous_frame.throw1.nil?	#will not allow to play on frame 2 if frame 1 is still to be played, did not implement a too complicated logic for this such as checking if both players have played the same frame number, etc
+    if previous_frame.present? && previous_frame.throw1.nil?  #will not allow to play on frame 2 if frame 1 is still to be played, did not implement a too complicated logic for this such as checking if both players have played the same frame number, etc
       puts "\nPlease play on the previous frame: #{previous_frame.id}\n"
       return
     end
@@ -41,7 +41,7 @@ curl -X POST \
       end
 
       if is_strike?
-        self.throw2 = 0 	#even if another value is set in the post body, throw2 will be defaulted to 0 in case of a strike
+        self.throw2 = 0   #even if another value is set in the post body, throw2 will be defaulted to 0 in case of a strike
 
         puts"\nStrike!\n"
       elsif is_throw2_valid?(throw2)
@@ -96,7 +96,7 @@ curl -X POST \
   def update_score_previous_frame
     previous_frame = get_previous_frame
 
-    return unless previous_frame.present?
+    return false unless previous_frame.present?
 
     if previous_frame.is_strike_or_spare?
       if previous_frame.is_strike?
@@ -113,12 +113,6 @@ curl -X POST \
     throw1.to_i + throw2.to_i + throw3.to_i
   end
 
-  private
-
-  def get_previous_frame
-    previous_frame = Frame.find_by(game_id: game_id, player_id: player_id, number: (number - 1))
-  end
-
   def is_strike_or_spare?
     is_strike? || is_spare?
   end
@@ -127,16 +121,22 @@ curl -X POST \
     throw1 == 10
   end
 
+  def is_spare?
+    !is_strike? && ((throw1.to_i + throw2.to_i) == 10)
+  end
+
+  private
+
+  def get_previous_frame
+    previous_frame = Frame.find_by(game_id: game_id, player_id: player_id, number: (number - 1))
+  end
+
   def is_strike_2?
     throw2 == 10
   end
 
   def is_strike_3?
     throw3 == 10
-  end
-
-  def is_spare?
-    !is_strike? && ((throw1.to_i + throw2.to_i) == 10)
   end
 
   def is_spare_3?
