@@ -1,24 +1,26 @@
-#require 'rufus-scheduler'
-#require 'uri'
-#require 'net/http'
+=begin
+require 'rufus-scheduler'
+require 'uri'
+require 'net/http'
 
-#scheduler = Rufus::Scheduler.new
+scheduler = Rufus::Scheduler.new
 
-#scheduler.every '2s' do
-#  game_number = 1
-#  game = Game.find(game_number)
-#  if game.present?
-#    url = URI("http://localhost:3000/api/v1/games/#{game_number}/get_game_score")
+scheduler.every '2s' do
+  game_number = 1
+  game = Game.find(game_number)
+  if game.present?
+    url = URI("http://localhost:3000/api/v1/games/#{game_number}/get_game_score")
 
-#    request = Net::HTTP::Get.new(url)
+    request = Net::HTTP::Get.new(url)
 
-#    response = Net::HTTP.start(url.hostname, url.port) do |http|
-#      http.request(request)
-#    end
+    response = Net::HTTP.start(url.hostname, url.port) do |http|
+      http.request(request)
+    end
 
-#    puts response.body
-#  end
-#end
+    puts response.body
+  end
+end
+=end
 
 
 =begin
